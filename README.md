@@ -1,77 +1,41 @@
-ping-lite [![Build Status](https://secure.travis-ci.org/ben-bradley/ping-lite.png)](http://travis-ci.org/ben-bradley/ping-lite) [![NPM](https://nodei.co/npm/ping-lite.png?downloads=true)](https://nodei.co/npm/ping-lite/)
-=========
-A simple ping module for NodeJS apps.
+# toobs [![Build Status](https://secure.travis-ci.org/ben-bradley/toobs.png)](http://travis-ci.org/ben-bradley/toobs) [![NPM](https://nodei.co/npm/toobs.png?downloads=true)](https://nodei.co/npm/toobs/)
 
-Install
-=======
-`npm install ping-lite`
+A network speed testing tool for NodeJS.
+*Still in development, don't use this yet!*
 
-Test
-====
+## Install
+
+`npm install ben-bradley/toobs`
+
+## Test
+
+Coming ~~soon~~ eventually...
 `cd node_modules/ping-lite && mocha`
 
-Usage
-=====
+## Usage
+
+See the examples
+
+## Events
+
+- Socket
+  - `sample` - Returns an object containing the details of the most recent sample of traffic:
 ```javascript
-var Ping = require('ping-lite');
-
-var ping = new Ping('8.8.8.8');
-
-ping.send(function(ms) {
-  console.log(this._host+' responded in '+ms+'ms.');
-});
+{
+  time: <ms>,
+  bytesTx: 1234,
+  bytesRx: 4321,
+  BpsTx: 6789,
+  BpsRx: 9876,
+  MBpsTx: 0.12,
+  MBpsRx: 0.21
+}
 ```
+ - [Class `net.Socket` events](http://nodejs.org/api/net.html#net_class_net_socket)
 
-Events
-======
-- `error` = When the `._bin` throws an error
-- `result` = When the `._bin` completes, no response returns __null__
+## Methods
 
-Methods
-=======
-- **#send(callback)** accepts an optional callback that returns an error if there's an issue with theh `._bin`, a `null` if there's no response or an `Integer` if the host responds.
-- **#start(callback)** calls `#send` every 5 seconds until `#stop` is called
-- **#stop()** stops active pings
 
-Examples
-========
-```javascript
-// send one ping & handle results with callbacks
-var Ping = require('ping-lite');
+## Examples
 
-var ping = new Ping('8.8.8.8');
-
-ping.send(function(ms) {
-  console.log(this._host+' responded in '+ms+'ms.');
-});
-```
-```javascript
-// send pings until stopped & handle results with callbacks
-var Ping = require('ping-lite');
-
-var ping = new Ping('8.8.8.8');
-
-ping.start(function(ms) {
-  console.log(this._host+' responded in '+ms+'ms.');
-});
-
-setTimeout(function() {
-  ping.stop();
-}, 20000);
-```
-```javascript
-// send one ping & handle results with events
-var Ping = require('ping-lite');
-
-var ping = new Ping('8.8.8.8');
-
-ping.on('error', function(err) {
-  console.log('uhoh: ',err);
-});
-
-ping.on('result', function(ms) {
-  console.log(this._host+' responded in '+ms+'ms.');
-});
-
-ping.send(); // or ping.start();
-```
+For now, check the `examples/` folder, but I will build this out once toobs comes out of dev
