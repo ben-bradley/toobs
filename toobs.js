@@ -1,101 +1,87 @@
-var net       = require('net'),
-    events    = require('events'),
-    util      = require('util');
+var net = require('net');
 
-
+// Server constructor
+// ==================
 function Server(options) {
   options = options || {};
-  server = net.createServer();
+  return net.createServer(function(socket) {
+    socket = new Socket(socket);
+  }).listen(options.port || 5000);
+};
 
-  server.on('connection', function(socket) {
-    console.log('client connected');
-    socket.on('test:started', function() {
-      socket._sampler = new Sampler(socket);
-      socket.on('sample', function(sample) {
-        console.log('SAMPLE: ',sample.bps);
-      });
-    });
-    socket.on('end', function() {
-      console.log('wrote: '+socket.bytesWritten);
-      console.log('read : '+socket.bytesRead);
-    });
-  });
-
-  server.listen(options.port || 5000);
-
-  return server;
-}
-
-
+// Client constructor
+// ==================
 function Client(options) {
   options = options || {};
-  var socket = net.connect((options.port || 5000), (options.host || 'localhost'));
+  return new Socket(net.connect((options.port || 5000), (options.host || 'localhost')));
+};
 
-  socket.on('connect', function() {
-    socket.on('test:started', function() {
-      socket._sampler = new Sampler(socket);
-      socket.on('sample', function(sample) {
-        console.log('SAMPLE: ',sample);
-      });
-    });
-    socket.on('close', function() {
-      console.log('wrote: '+socket.bytesWritten);
-      console.log('read : '+socket.bytesRead);
-    });
-  });
+// Socket constructor
+// ==================
+function Socket(socket) {
 
-  socket.flood = function() {
-    console.log('socket._connected: ',socket._connected);
-    var buf = new Buffer(1000000); // 1GB
-    socket.emit('test:started');
-    socket.write(buf, function() {
-      socket.emit('test:done');
-    }); // send it & end it
-  }
-
-  return socket;
-}
-
-function Sampler(socket) {
+  // build the sampler
   socket._samples = [
-    { bytesRx: 0, bytesTx: 0, time: new Date().getTime()/1000, bps: 0 }
+    { bytesRx: 0, bytesTx: 0, time: new Date().getTime()/1000, BpsRx: 0, BpsTx: 0 }
   ];
-  var i = setInterval(function() {
-    var sample = { bytesRx: socket.bytesRead, bytesTx: socket.bytesWritten, time: new Date().getTime()/1000 },
-        last = socket._samples[socket._samples.length-1],
-        secs = sample.time - last.time;
-    console.log('last: ',last);
-    sample.bpsRx = (sample.bytesRx - last.bytesRx) / secs;
-    sample.bpsTx = (sample.bytesTx - last.bytesTx) / secs;
+  socket._sampler = setInterval(function() {
+    var sample = new Sample(socket);
     socket._samples.push(sample);
     socket.emit('sample', sample);
   }, 100); // every 0.1 sec
+
+  // handle events
   socket.on('close', function() {
-    clearInterval(i);
+    clearInterval(socket._sampler);
   });
+  socket.on('error', function() {
+    // for the moment, just die quietly
+  });
+  socket.on('end', function() {
+    // for the moment, just die quietly
+  });
+  socket.on('data', function(data) {
+    // *sigh* without this, the sampler won't increment
+  });
+  socket.on('sample', function(sample) {
+    if (sample.BpsTx > 0 || sample.BpsRx > 0)
+      console.log('!sample', sample);
+  });
+
+  // build tests
+  socket.rate = function(options) {
+    var buf = new Buffer(1000000),
+        r = setInterval(function() { socket.write(buf); }, 1000); // send buf every second
+    setTimeout(function() {
+      clearInterval(r);
+      socket.end();
+    }, 5000);
+  };
+  socket.flood = function(options) {
+    var buf = new Buffer(1000000);
+    socket.write(buf, function() { socket.end(); });
+  };
+
+  // return the socket
+  return socket;
 }
 
-util.inherits(Server, events.EventEmitter);
-util.inherits(Client, events.EventEmitter);
-
-var Toobs = {
-  Server: Server,
-  Client: Client
+// Sample constructor
+// ==================
+function Sample(socket) {
+  var sample = {
+        bytesRx: socket.bytesRead,
+        bytesTx: socket.bytesWritten,
+        time: new Date().getTime()/1000
+      },
+      last = socket._samples[socket._samples.length-1],
+      secs = sample.time - last.time;
+  sample.BpsRx = (sample.bytesRx - last.bytesRx) / secs;
+  sample.MBpsRx = Number((sample.BpsRx / 1048576).toFixed(2));
+  sample.BpsTx = (sample.bytesTx - last.bytesTx) / secs;
+  sample.MBpsTx = Number((sample.BpsTx / 1048576).toFixed(2));
+  return sample;
 }
 
-module.exports = Toobs;
-
-/*
-
-  // send 1GB/s for 10 seconds
-  // =========================
-  var buf = new Buffer(1000000); // 1GB
-  var i = setInterval(function() { client.write(buf); }, 1000); // every second
-  setTimeout(function() { clearInterval(i); client.destroy(); }, 10000); // for 10 seconds
-
-  // send 1GB as fast as possible
-  // ============================
-  var buf = new Buffer(1000000); // 1GB
-  client.write(buf, function() { client.end(); }); // send it & end it
-
-*/
+module.exports.Server = Server;
+module.exports.Client = Client;

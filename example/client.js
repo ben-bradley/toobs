@@ -1,8 +1,7 @@
 var toobs = require('../toobs');
 
-var client = new toobs.Client();
+var client = new toobs.Client({ host: '192.168.1.14' });
 
 client.on('connect', function() {
-  console.log(client);
   client.flood();
-})
+});
