@@ -14,11 +14,24 @@ Coming ~~soon~~ eventually...
 
 ## Usage
 
-See the examples
+See the examples for more detail
+
+```Javascript
+var toobs = require('toobs');
+
+var server = new toobs.Server({ port: 5000 });
+
+var client = new toobs.Client({ host: 'localhost', port: 5000 });
+
+client.on('connect', function() {
+  client.flood();  // start a flood test, sends 1GB of data as fast as possible
+});
+```
 
 ## Events
 
 - Socket
+  - [Class `net.Socket` events](http://nodejs.org/api/net.html#net_class_net_socket)
   - `sample` - Returns an object containing the details of the most recent sample of traffic:
 ```javascript
 {
@@ -31,7 +44,6 @@ See the examples
   MBpsRx: 0.21
 }
 ```
- - [Class `net.Socket` events](http://nodejs.org/api/net.html#net_class_net_socket)
 
 ## Methods
 
