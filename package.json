@@ -1,0 +1,39 @@
+{
+  "name": "toobs",
+  "version": "0.0.1",
+  "description": "Network speed test module",
+  "keywords": [
+    "iperf",
+    "tcp",
+    "speed",
+    "test",
+    "bandwidth"
+  ],
+  "scripts": {
+    "test": "cd test && mocha ./"
+  },
+  "author": {
+    "name": "Ben Bradley",
+    "email": "ben@bradleyit.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ben-bradley/toobs"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "browser": {
+  },
+  "main": "toobs.js",
+  "engines": {
+    "node": "*"
+  },
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/ben-bradley/toobs/issues"
+  },
+  "homepage": "https://github.com/ben-bradley/toobs"
+}
