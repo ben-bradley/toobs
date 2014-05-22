@@ -14,40 +14,77 @@ Coming ~~soon~~ eventually...
 
 ## Usage
 
-See the examples for more detail
+#### Server Side
+```javascript
+var toobs = require('../toobs');
 
-```Javascript
-var toobs = require('toobs');
+var server = new toobs.Server();
 
-var server = new toobs.Server({ port: 5000 });
+server.on('connection', function(socket) {
+  console.log('connected');
 
-var client = new toobs.Client({ host: 'localhost', port: 5000 });
+  socket.on('test:sample', function(sample) {
+    console.log(sample);
+  });
 
-client.on('connect', function() {
-  client.flood();  // start a flood test, sends 1GB of data as fast as possible
+  socket.on('test:start', function() {
+    console.log('test started');
+  });
+
+  socket.on('test:done', function(summary) {
+    console.log('test done');
+    console.log(summary);
+  });
+
 });
+```
+
+#### Client Side
+```javascript
+var toobs = require('../toobs');
+
+var client = new toobs.Client({ host: '192.168.1.14' });
+
+client.on('test:sample', function(sample) {
+  console.log(sample);
+});
+
+client.on('test:start', function() {
+  console.log('test started');
+});
+
+client.on('test:done', function(summary) {
+  console.log('test done');
+  console.log(summary);
+});
+
+client.test({
+  rate: '100MB',
+  time: 10
+});
+```
+
+## Toobs Tests
+
+`Client.test(options)` The `options` object can have the following properties:
+```javascript
+{ // send .rate/sec for .time seconds
+  rate: '1gb', // string format: "{num}(b|kb|mb|gb|B|KB|MB)", max is "1023MB"
+  time: 10     // number of seconds to run the test
+}
+```
+```javascript
+{ // send a .size buffer, NodeJS will dumps straight to the kernel
+  .size: '500mb' // send a 500mbit buffer, same format as .rate
+}
 ```
 
 ## Events
 
-- Socket
+- Client
   - [Class `net.Socket` events](http://nodejs.org/api/net.html#net_class_net_socket)
-  - `sample` - Returns an object containing the details of the most recent sample of traffic:
-```javascript
-{
-  time: <ms>,
-  bytesTx: 1234,
-  bytesRx: 4321,
-  BpsTx: 6789,
-  BpsRx: 9876,
-  MBpsTx: 0.12,
-  MBpsRx: 0.21
-}
-```
-
-## Methods
-
-
-## Examples
-
-For now, check the `examples/` folder, but I will build this out once toobs comes out of dev
+  - `test:sample` - Returns an object containing the details of the most recent sample of traffic
+  - `test:start` - Emitted when a test is started
+  - `test:done` - Emitted when a socket is closed
+- Server
+  - [Class `net.Server` events](http://nodejs.org/api/net.html#net_class_net_server)
