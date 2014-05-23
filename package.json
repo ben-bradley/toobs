@@ -1,6 +1,6 @@
 {
   "name": "toobs",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Network speed test module",
   "keywords": [
     "iperf",
@@ -11,6 +11,9 @@
   ],
   "scripts": {
     "test": "mocha -R spec"
+  },
+  "bin": {
+    "toobs": "./bin/cli.js"
   },
   "author": {
     "name": "Ben Bradley",
