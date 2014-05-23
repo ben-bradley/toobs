@@ -1,6 +1,6 @@
 {
   "name": "toobs",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "Network speed test module",
   "keywords": [
     "iperf",
@@ -10,7 +10,7 @@
     "bandwidth"
   ],
   "scripts": {
-    "test": "cd test && mocha ./"
+    "test": "mocha -R spec"
   },
   "author": {
     "name": "Ben Bradley",

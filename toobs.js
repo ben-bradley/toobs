@@ -71,6 +71,8 @@ function Socket(socket) {
   });
 
   socket.on('end', function() {
+    if (socket._samples.length == 1)
+      return socket.emit('test:done', []);
     var samples = socket._samples.slice();
     samples.shift();
     var summary = {

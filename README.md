@@ -75,7 +75,7 @@ client.test({
 ```
 ```javascript
 { // send a .size buffer, NodeJS will dumps straight to the kernel
-  .size: '500mb' // send a 500mbit buffer, same format as .rate
+  size: '500mb' // send a 500mbit buffer, same format as .rate
 }
 ```
 
