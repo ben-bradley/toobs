@@ -6,11 +6,21 @@ A network speed testing tool for NodeJS.
 
 ## Install
 
-`npm install toobs`
+- As a module
+```javascript
+npm install toobs
+```
+- As a binary
+```javascript
+npm install -g toobs
+```
 
 ## Usage
 
 #### Server Side
+
+- As a module
+
 ```javascript
 var toobs = require('toobs');
 
@@ -35,7 +45,16 @@ server.on('connection', function(socket) {
 });
 ```
 
+- As a binary
+
+```javascript
+$ toobs --server [--port=5000]
+```
+
 #### Client Side
+
+- As a module
+
 ```javascript
 var toobs = require('toobs');
 
@@ -58,6 +77,12 @@ client.test({
   rate: '100MB',
   time: 10
 });
+```
+
+- As a binary
+
+```javascript
+$ toobs --client --host=localhost [--port=5000] (--size=1gb | --rate=100mb --time=5)
 ```
 
 ## `bits` vs. `Bytes`
