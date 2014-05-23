@@ -27,7 +27,9 @@ if (args.server) {
       console.log('=================================[ SUMMARY ]=================================');
     });
   });
-  server.on('listening', console.log('toobs Server listening!\n\n'));
+  server.on('listening', function() {
+    console.log('toobs Server listening!\n\n')
+  });
 }
 
 if (args.client) {
